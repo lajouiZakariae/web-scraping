@@ -82,9 +82,8 @@ function extractDataFromEl(el) {
   }
 }
 
-function saveProducts() {
+const saveProducts = () =>
   writeFile('data.json', JSON.stringify(products), () => {});
-}
 
 /**
  * Save All images Locally
@@ -96,13 +95,25 @@ function saveImages() {
     }
   });
 
+  const { image_url, image_path } = products.at(0);
+  axios.get(image_url, { responseEncoding: 'base64' }).then((response) => {
+    writeFile(
+      image_path,
+      response.data,
+      { encoding: 'base64' },
+      (err) => err && console.log(err)
+    );
+  });
+
   products.forEach(({ image_url, image_path }) => {
-    axios.get(image_url, { responseType: 'arraybuffer' }).then(({ data }) => {
-      const content = Buffer.from(data, 'base64');
-      // rmSync();
-      writeFile('images/' + image_path, content, function (err) {
-        console.log(err);
-      });
+    axios.get(image_url).then((response) => {
+      console.log(response);
+      const content = Buffer.from(response.data, 'base64');
+      // writeFile(
+      //   'images/' + image_path,
+      //   content,
+      //   (err) => err && console.log(err)
+      // );
     });
   });
 }
