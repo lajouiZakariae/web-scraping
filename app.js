@@ -99,7 +99,6 @@ function saveImages() {
   products.forEach(({ image_url, image_path }) => {
     axios.get(image_url, { responseType: 'arraybuffer' }).then(({ data }) => {
       const content = Buffer.from(data, 'base64');
-      // rmSync();
       writeFile('images/' + image_path, content, function (err) {
         console.log(err);
       });
