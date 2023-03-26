@@ -4,7 +4,7 @@
 
 const cheerio = require('cheerio');
 const axios = require('axios');
-const { writeFile, readdir, unlink } = require('fs');
+const { writeFile, readdir, unlink, writeFileSync } = require('fs');
 const path = require('path');
 
 const products = [];
@@ -82,8 +82,28 @@ function extractDataFromEl(el) {
   }
 }
 
-const saveProducts = () =>
-  writeFile('data.json', JSON.stringify(products), () => {});
+/**
+ * Save Into a CSV file
+ */
+const saveProducts = () => {
+  const headers = Object.keys(products[0]).join(', ').concat('\n');
+
+  const body = products.reduce((acc, note) => {
+    return (
+      acc +
+      Object.values(note)
+        .map((val) =>
+          typeof val === 'string'
+            ? '"' + val + '"'
+            : '"' + ('' + val).replace('.', ',') + '"'
+        )
+        .join(', ')
+        .concat('\n')
+    );
+  }, '');
+
+  writeFileSync('data.csv', headers + body);
+};
 
 /**
  * Save All images Locally
